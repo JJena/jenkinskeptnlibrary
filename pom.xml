@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.mimecast</groupId>
+    <groupId>com.test</groupId>
     <artifactId>keptnjenkinslibrary</artifactId>
     <version>1.0-SNAPSHOT</version>
 
@@ -73,7 +73,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.mimecast.keptn.keptnTaskHandler</mainClass>
+                            <mainClass>com.test.keptn.keptnTaskHandler</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
