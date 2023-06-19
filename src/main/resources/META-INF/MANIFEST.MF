@@ -1,2 +1,2 @@
 Manifest-Version: 1.0
-Main-Class: com.mimecast.keptn.keptnTaskHandler
+Main-Class: com.test.keptn.keptnTaskHandler
