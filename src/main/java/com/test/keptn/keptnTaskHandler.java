@@ -10,9 +10,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import java.io.IOException;
-import static com.mimecast.keptn.utils.jsonBeautify.jsonBeautify;
+import static com.test.keptn.utils.jsonBeautify.jsonBeautify;
 
-import static com.mimecast.keptn.utils.extractJsonField.extractFieldFromResponse;
+import static com.test.keptn.utils.extractJsonField.extractFieldFromResponse;
 
 public class keptnTaskHandler {
 
