@@ -18,7 +18,7 @@ public class keptnTaskHandler {
 
     private static final String keptnEndpoint = "http://10.7.12.37:8081";
     //private static final String xToken = "OobO0fxIY6Kgwf7gzbmq6kyJUfWAgFar7EOts6bL1mm9A";
-    private static final String xToken = System.getenv("env.xToken");;
+    private static final String xToken = System.getProperty("xToken");
     private static Object keptnContext = "";
     private static Object Score = "";
     private static Object Results = "";
