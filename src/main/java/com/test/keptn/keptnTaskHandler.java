@@ -17,8 +17,7 @@ import static com.test.keptn.utils.extractJsonField.extractFieldFromResponse;
 public class keptnTaskHandler {
 
     private static final String keptnEndpoint = "http://10.7.12.37:8081";
-    //private static final String xToken = "OobO0fxIY6Kgwf7gzbmq6kyJUfWAgFar7EOts6bL1mm9A";
-    private static final String xToken = System.getProperty("xToken");
+    private static final String xToken = "";
     private static Object keptnContext = "";
     private static Object Score = "";
     private static Object Results = "";
@@ -27,6 +26,9 @@ public class keptnTaskHandler {
     private static final String resultPath = "events..data..evaluation.result";
 
     public static void main(String[] args) throws InterruptedException {
+
+        System.out.println("env.xToken:   "+System.getenv("env.xToken"));
+        System.out.println("xToken Param:   "+System.getProperty("xToken"));
 
         try {
             // URL to send the POST request to
