@@ -51,7 +51,7 @@ public class keptnTaskHandler {
             httpPost.setEntity(entity);
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setHeader("Accept", "application/json");
-            httpPost.setHeader("x-token", xToken);
+            httpPost.setHeader("x-token", xtoken);
 
             // Send the POST request
             HttpResponse response = httpClient.execute(httpPost);
@@ -89,7 +89,7 @@ public class keptnTaskHandler {
 
             httpGet.setHeader("Content-Type", "application/json");
             httpGet.setHeader("Accept", "application/json");
-            httpGet.setHeader("x-token", xToken);
+            httpGet.setHeader("x-token", xtoken);
 
             // Send the GET request
             HttpResponse response = httpClient.execute(httpGet);
