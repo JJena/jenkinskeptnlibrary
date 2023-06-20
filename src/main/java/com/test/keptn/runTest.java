@@ -25,6 +25,7 @@ public class runTest {
     private static final String scorePath = "events..data..evaluation.score";
     private static final String resultPath = "events..data..evaluation.result";
     private static final String taskStatePath = "states.";
+    private static final String taskStatePathh = "states[0]";
 
     public static String runTest(String keptnEndpoint, String xToken) throws InterruptedException {
 
@@ -117,7 +118,9 @@ public class runTest {
                 // Modify this code according to your JSON structure
                 // Here, we assume the response is in JSON and has a field named "result"
                 Object taskState = extractFieldFromResponse(responseBody, taskStatePath);
-                System.out.println("checkTaskCompletion|taskState: " + taskState);
+                System.out.println("checkTaskCompletion|taskState1: " + taskState);
+                Object taskState = extractFieldFromResponse(responseBody, taskStatePathh);
+                System.out.println("checkTaskCompletion|taskState2: " + taskState);
                 taskStatus = taskState.toString();
             }
             Thread.sleep(10000);
