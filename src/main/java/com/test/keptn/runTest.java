@@ -20,7 +20,7 @@ public class runTest {
     private static Object Results = "";
     private static Object TaskState = "";
     private static final String runTestPath = "/api/v1/event";
-    private static final String getTaskStatusPath = "api/controlPlane/v1/sequence/loadtest?keptnContext=";
+    private static final String getTaskStatusPath = "/api/controlPlane/v1/sequence/loadtest?keptnContext=";
     private static final String keptnContextPath = "keptnContext";
     private static final String scorePath = "events..data..evaluation.score";
     private static final String resultPath = "events..data..evaluation.result";
@@ -89,7 +89,7 @@ public class runTest {
     public static void checkTestCompletion(String keptnEndpoint, String xToken, String keptnContext) {
 
     try{
-        String url = keptnEndpoint+getTaskStatusPath+keptnContext.toString();
+        String url = keptnEndpoint+getTaskStatusPath+keptnContext;
         // Create HttpClient
         HttpClient httpClient = HttpClientBuilder.create().build();
 
