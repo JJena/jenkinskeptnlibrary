@@ -119,7 +119,7 @@ public class runTest {
                 // Here, we assume the response is in JSON and has a field named "result"
                 Object taskState = extractFieldFromResponse(responseBody, taskStatePath);
                 System.out.println("checkTaskCompletion|taskState1: " + taskState);
-                Object taskState = extractFieldFromResponse(responseBody, taskStatePathh);
+                taskState = extractFieldFromResponse(responseBody, taskStatePathh);
                 System.out.println("checkTaskCompletion|taskState2: " + taskState);
                 taskStatus = taskState.toString();
             }
