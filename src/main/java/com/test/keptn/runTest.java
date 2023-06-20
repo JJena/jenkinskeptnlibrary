@@ -24,7 +24,7 @@ public class runTest {
     private static final String keptnContextPath = "keptnContext";
     private static final String scorePath = "events..data..evaluation.score";
     private static final String resultPath = "events..data..evaluation.result";
-    private static final String taskStatePath = "states.";
+    private static final String taskStatePath = "states";
     private static final String taskStatePathh = "states[0]";
 
     public static String runTest(String keptnEndpoint, String xToken) throws InterruptedException {
