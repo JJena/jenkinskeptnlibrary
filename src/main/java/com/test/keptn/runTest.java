@@ -26,6 +26,7 @@ public class runTest {
     private static final String resultPath = "events..data..evaluation.result";
     private static final String taskStatePath = "states";
     private static final String taskStatePathh = "states[0]";
+    private static final String taskStatePathhh = "states[0].state";
 
     public static String runTest(String keptnEndpoint, String xToken) throws InterruptedException {
 
@@ -121,6 +122,8 @@ public class runTest {
                 System.out.println("checkTaskCompletion|taskState1: " + taskState);
                 taskState = extractFieldFromResponse(responseBody, taskStatePathh);
                 System.out.println("checkTaskCompletion|taskState2: " + taskState);
+                taskState = extractFieldFromResponse(responseBody, taskStatePathhh);
+                System.out.println("checkTaskCompletion|taskState3: " + taskState);
                 //taskStatus = taskState.toString();
             }
             Thread.sleep(10000);
