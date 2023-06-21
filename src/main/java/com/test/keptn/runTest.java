@@ -112,7 +112,7 @@ public class runTest {
                 // Extract the response body as a string
                 String responseBody = EntityUtils.toString(responseEntity);
                 String responseBodyBeautified = jsonBeautify(responseBody);
-                System.out.println("checkTaskCompletion|Test execution in Progress");
+                System.out.println("checkTaskCompletion|Test execution in Progress: "+responseBody);
 
                 // Extract the desired field from the response
                 // Modify this code according to your JSON structure
@@ -121,7 +121,7 @@ public class runTest {
                 System.out.println("checkTaskCompletion|taskState1: " + taskState);
                 taskState = extractFieldFromResponse(responseBody, taskStatePathh);
                 System.out.println("checkTaskCompletion|taskState2: " + taskState);
-                taskStatus = taskState.toString();
+                //taskStatus = taskState.toString();
             }
             Thread.sleep(10000);
         }
