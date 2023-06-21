@@ -19,7 +19,6 @@ public class keptnTaskHandler {
     switch (testMode){
         case "Test_And_Evaluate":
             String keptnContext = runTest.runTest(keptnEndpoint,xToken);
-            Thread.sleep(3000);
             runTest.checkTestCompletion(keptnEndpoint,xToken,keptnContext);
             break;
         case "Evaluate":
