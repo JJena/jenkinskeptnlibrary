@@ -10,36 +10,42 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 import static com.test.keptn.utils.extractJsonField.extractFieldFromResponse;
+import static com.test.keptn.utils.jsonBeautify.jsonBeautify;
 
-public class runTest {
+public class runEvaluate {
     private static Object keptnContext = "";
-    private static Object newTaskState = "started";
-    private static final String initialTaskState = "started";
-    private static final String runTestPath = "/api/v1/event";
-    private static final String getTaskStatusPath = "/api/controlPlane/v1/sequence/loadtest?keptnContext=";
-    private static String Url = "";
+    private static Object Score = "";
+    private static Object Results = "";
     private static final String keptnContextPath = "keptnContext";
-    private static final String taskStatePath = "states[0].state";
-    private static String runTestPayload = "{\n" +
+    private static final String evaluatePath = "/api/v1/event";
+    private static String getResultPath = "/api/mongodb-datastore/event?keptnContext=placeholder&type=sh.keptn.event.evaluation.finished";
+    private static final String scorePath = "events..data..evaluation.score";
+    private static final String resultPath = "events..data..evaluation.result";
+    private static String Url = "";
+    private static String evaluateTestPayload = "{\n" +
             "  \"data\": {\n" +
-            "     \"labels\": {\n" +
+            "    \"labels\": {\n" +
+            "       \"slofilename\": \"slofile_name\" \n" +
+            "    },\n" +
+            "    \"evaluation\": {\n" +
+            "      \"timeframe\": \"evaluationDurationMinutes\"\n" +
             "    },\n" +
             "    \"project\": \"project_name\",\n" +
             "    \"service\": \"service_name\",\n" +
             "    \"stage\": \"stage_name\"\n" +
             "  },\n" +
-            "  \"type\": \"sh.keptn.event.stage_name.loadtest-execution.triggered\",\n" +
-            "  \"source\": \"bridge\"\n" +
+            "  \"source\": \"https://github.com/keptn/keptn/api\",\n" +
+            "  \"type\": \"sh.keptn.event.stage_name.evaluation.triggered\"\n" +
             "}";
 
-    public static String runTest(String keptnEndpoint, String xToken, String project, String service, String stage) throws InterruptedException {
+    public static void evaluateTest(String keptnEndpoint, String xToken, String project, String service, String stage, String sloFile, String evaluationDurationMinutes) throws InterruptedException {
 
+        //Trigger Evaluation
         try {
             // URL to send the POST request to
-            Url = keptnEndpoint + runTestPath;
+            Url = keptnEndpoint + evaluatePath;
 
             // Create HttpClient
             HttpClient httpClient = HttpClientBuilder.create().build();
@@ -47,13 +53,14 @@ public class runTest {
             // Create HttpPost request with URL
             HttpPost httpPost = new HttpPost(Url);
 
-            //Replace the payload placeholders with actual values
-            runTestPayload = runTestPayload.replace("project_name",project);
-            runTestPayload = runTestPayload.replace("service_name",service);
-            runTestPayload = runTestPayload.replace("stage_name",stage);
+            //Replace json payload placeholders with actual values
+            evaluateTestPayload = evaluateTestPayload.replace("project_name",project);
+            evaluateTestPayload = evaluateTestPayload.replace("service_name",service);
+            evaluateTestPayload = evaluateTestPayload.replace("stage_name",stage);
+            evaluateTestPayload = evaluateTestPayload.replace("evaluationDurationMinutes",evaluationDurationMinutes);
 
             // Set the JSON payload as the request entity
-            StringEntity entity = new StringEntity(runTestPayload);
+            StringEntity entity = new StringEntity(evaluateTestPayload);
             httpPost.setEntity(entity);
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setHeader("Accept", "application/json");
@@ -69,54 +76,58 @@ public class runTest {
             if (responseEntity != null) {
                 // Extract the response body as a string
                 String responseBody = EntityUtils.toString(responseEntity);
-                System.out.println("runTest|Test triggerred successfully|Response: " + responseBody);
+                System.out.println("Response: " + responseBody);
 
                 // Extract the desired field from the response
                 // Modify this code according to your JSON structure
                 // Here, we assume the response is in JSON and has a field named "result"
                 keptnContext = extractFieldFromResponse(responseBody, keptnContextPath);
-                System.out.println(" runTest|keptnContext: " + keptnContext);
+                System.out.println("runEvaluate|keptnContext: " + keptnContext);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return keptnContext.toString();
-    }
-    public static void checkTestCompletion(String keptnEndpoint, String xToken, String keptnContext) {
 
-    try{
-        Url = keptnEndpoint+getTaskStatusPath+keptnContext;
-        // Create HttpClient
-        HttpClient httpClient = HttpClientBuilder.create().build();
+        Thread.sleep(3000);
 
-        // Create Http Get request with URL
-        HttpGet httpGet = new HttpGet(Url);
+        //Get results of the evaluation
+        try {
+            getResultPath = getResultPath.replace("placeholder",keptnContext.toString());
+            // URL to send the GET request to
+            Url = keptnEndpoint + getResultPath;
 
-        httpGet.setHeader("Content-Type", "application/json");
-        httpGet.setHeader("Accept", "application/json");
-        httpGet.setHeader("x-token", xToken);
+            // Create HttpClient
+            HttpClient httpClient = HttpClientBuilder.create().build();
 
-        //Keep checking status till the new state is "started"
-        while(newTaskState.toString().equals(initialTaskState)) {
+            // Create HttpPost request with URL
+            HttpGet httpGet = new HttpGet(Url);
+
+            httpGet.setHeader("Content-Type", "application/json");
+            httpGet.setHeader("Accept", "application/json");
+            httpGet.setHeader("x-token", xToken);
+
             // Send the GET request
             HttpResponse response = httpClient.execute(httpGet);
+            assert response.getStatusLine().getStatusCode() < 400;
+
             // Get the response entity
             HttpEntity responseEntity = response.getEntity();
 
             if (responseEntity != null) {
                 // Extract the response body as a string
                 String responseBody = EntityUtils.toString(responseEntity);
+                String responseBodyBeautified = jsonBeautify(responseBody);
 
                 // Extract the desired field from the response
                 // Modify this code according to your JSON structure
                 // Here, we assume the response is in JSON and has a field named "result"
-                newTaskState = extractFieldFromResponse(responseBody, taskStatePath);
-                System.out.println(LocalDateTime.now() +":checkTaskCompletion|Test execution in Progress|taskState: "+newTaskState);
+                Score = extractFieldFromResponse(responseBody, scorePath);
+                Results = extractFieldFromResponse(responseBody, resultPath);
+                System.out.println("runEvaluate|score: " + Score +"result: "+Results);
+                System.out.println("runEvaluate| Detailed result:\n" + responseBodyBeautified);
             }
-            Thread.sleep(10000);
-        }
-    } catch (IOException | InterruptedException e) {
-        e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
