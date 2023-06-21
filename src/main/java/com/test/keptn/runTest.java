@@ -10,20 +10,17 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import static com.test.keptn.utils.extractJsonField.extractFieldFromResponse;
-import static com.test.keptn.utils.jsonBeautify.jsonBeautify;
 
 public class runTest {
     private static Object keptnContext = "";
-    private static Object Score = "";
-    private static Object Results = "";
-    private static Object TaskState = "";
+    private static Object newTaskState = "started";
+    private static final String initialTaskState = "started";
     private static final String runTestPath = "/api/v1/event";
     private static final String getTaskStatusPath = "/api/controlPlane/v1/sequence/loadtest?keptnContext=";
     private static final String keptnContextPath = "keptnContext";
-    private static final String scorePath = "events..data..evaluation.score";
-    private static final String resultPath = "events..data..evaluation.result";
     private static final String taskStatePath = "states[0].state";
 
     public static String runTest(String keptnEndpoint, String xToken) throws InterruptedException {
@@ -100,8 +97,8 @@ public class runTest {
         httpGet.setHeader("Accept", "application/json");
         httpGet.setHeader("x-token", xToken);
 
-        String taskStatus="started";
-        while(taskStatus.equals("started")) {
+        //Keep checking status till the new state is "started"
+        while(newTaskState.toString().equals(initialTaskState)) {
             // Send the GET request
             HttpResponse response = httpClient.execute(httpGet);
             // Get the response entity
@@ -110,15 +107,12 @@ public class runTest {
             if (responseEntity != null) {
                 // Extract the response body as a string
                 String responseBody = EntityUtils.toString(responseEntity);
-                String responseBodyBeautified = jsonBeautify(responseBody);
-                System.out.println("checkTaskCompletion|Test execution in Progress....");
 
                 // Extract the desired field from the response
                 // Modify this code according to your JSON structure
                 // Here, we assume the response is in JSON and has a field named "result"
-                Object taskState = extractFieldFromResponse(responseBody, taskStatePath);
-                System.out.println("checkTaskCompletion|taskState: " + taskState);
-                taskStatus = taskState.toString();
+                newTaskState = extractFieldFromResponse(responseBody, taskStatePath);
+                System.out.println(LocalDateTime.now() +":checkTaskCompletion|Test execution in Progress|taskState: "+newTaskState);
             }
             Thread.sleep(10000);
         }
