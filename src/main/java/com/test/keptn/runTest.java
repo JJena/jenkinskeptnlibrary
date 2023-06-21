@@ -24,9 +24,7 @@ public class runTest {
     private static final String keptnContextPath = "keptnContext";
     private static final String scorePath = "events..data..evaluation.score";
     private static final String resultPath = "events..data..evaluation.result";
-    private static final String taskStatePath = "states";
-    private static final String taskStatePathh = "states[0]";
-    private static final String taskStatePathhh = "states[0].state";
+    private static final String taskStatePath = "states[0].state";
 
     public static String runTest(String keptnEndpoint, String xToken) throws InterruptedException {
 
@@ -102,8 +100,8 @@ public class runTest {
         httpGet.setHeader("Accept", "application/json");
         httpGet.setHeader("x-token", xToken);
 
-        String taskStatus="";
-        while(taskStatus.equals("")) {
+        String taskStatus="started";
+        while(taskStatus.equals("started")) {
             // Send the GET request
             HttpResponse response = httpClient.execute(httpGet);
             // Get the response entity
@@ -119,12 +117,8 @@ public class runTest {
                 // Modify this code according to your JSON structure
                 // Here, we assume the response is in JSON and has a field named "result"
                 Object taskState = extractFieldFromResponse(responseBody, taskStatePath);
-                System.out.println("checkTaskCompletion|taskState1: " + taskState);
-                taskState = extractFieldFromResponse(responseBody, taskStatePathh);
-                System.out.println("checkTaskCompletion|taskState2: " + taskState);
-                taskState = extractFieldFromResponse(responseBody, taskStatePathhh);
-                System.out.println("checkTaskCompletion|taskState3: " + taskState);
-                //taskStatus = taskState.toString();
+                System.out.println("checkTaskCompletion|taskState: " + taskState);
+                taskStatus = taskState.toString();
             }
             Thread.sleep(10000);
         }
