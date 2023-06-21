@@ -57,6 +57,7 @@ public class runEvaluate {
             evaluateTestPayload = evaluateTestPayload.replace("project_name",project);
             evaluateTestPayload = evaluateTestPayload.replace("service_name",service);
             evaluateTestPayload = evaluateTestPayload.replace("stage_name",stage);
+            evaluateTestPayload = evaluateTestPayload.replace("slofile_name",sloFile);
             evaluateTestPayload = evaluateTestPayload.replace("evaluationDurationMinutes",evaluationDurationMinutes);
 
             // Set the JSON payload as the request entity
