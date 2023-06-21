@@ -20,41 +20,40 @@ public class runTest {
     private static final String initialTaskState = "started";
     private static final String runTestPath = "/api/v1/event";
     private static final String getTaskStatusPath = "/api/controlPlane/v1/sequence/loadtest?keptnContext=";
+    private static String Url = "";
     private static final String keptnContextPath = "keptnContext";
     private static final String taskStatePath = "states[0].state";
+    private static String runTestPayload = "{\n" +
+            "  \"data\": {\n" +
+            "     \"labels\": {\n" +
+            "    },\n" +
+            "    \"project\": \"project_name\",\n" +
+            "    \"service\": \"service_name\",\n" +
+            "    \"stage\": \"stage_name\"\n" +
+            "  },\n" +
+            "  \"type\": \"sh.keptn.event.stage_name.loadtest-execution.triggered\",\n" +
+            "  \"source\": \"bridge\"\n" +
+            "}";
 
-    public static String runTest(String keptnEndpoint, String xToken) throws InterruptedException {
+    public static String runTest(String keptnEndpoint, String xToken, String project, String service, String stage) {
 
         try {
             // URL to send the POST request to
-            String url = keptnEndpoint + runTestPath;
-
-            // JSON payload for the POST request
-            String jsonPayload = "{\n" +
-                    "  \"data\": {\n" +
-                    "     \"labels\": {\n" +
-                    "    },\n" +
-                    "    \"project\": \"loadtest\",\n" +
-                    "    \"service\": \"test-service\",\n" +
-                    "    \"stage\": \"loadtest-branch\",\n" +
-                    "    \"temporaryData\": {\n" +
-                    "      \"distributor\": {\n" +
-                    "        \"subscriptionID\": \"\"\n" +
-                    "      }\n" +
-                    "    }\n" +
-                    "  },\n" +
-                    "  \"type\": \"sh.keptn.event.loadtest-branch.loadtest-execution.triggered\",\n" +
-                    "  \"source\": \"bridge\"\n" +
-                    "}";
+            Url = keptnEndpoint + runTestPath;
 
             // Create HttpClient
             HttpClient httpClient = HttpClientBuilder.create().build();
 
             // Create HttpPost request with URL
-            HttpPost httpPost = new HttpPost(url);
+            HttpPost httpPost = new HttpPost(Url);
+
+            //Replace the payload placeholders with actual values
+            runTestPayload = runTestPayload.replace("project_name",project);
+            runTestPayload = runTestPayload.replace("service_name",service);
+            runTestPayload = runTestPayload.replace("stage_name",stage);
 
             // Set the JSON payload as the request entity
-            StringEntity entity = new StringEntity(jsonPayload);
+            StringEntity entity = new StringEntity(runTestPayload);
             httpPost.setEntity(entity);
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setHeader("Accept", "application/json");
@@ -86,12 +85,12 @@ public class runTest {
     public static void checkTestCompletion(String keptnEndpoint, String xToken, String keptnContext) {
 
     try{
-        String url = keptnEndpoint+getTaskStatusPath+keptnContext;
+        Url = keptnEndpoint+getTaskStatusPath+keptnContext;
         // Create HttpClient
         HttpClient httpClient = HttpClientBuilder.create().build();
 
         // Create Http Get request with URL
-        HttpGet httpGet = new HttpGet(url);
+        HttpGet httpGet = new HttpGet(Url);
 
         httpGet.setHeader("Content-Type", "application/json");
         httpGet.setHeader("Accept", "application/json");
