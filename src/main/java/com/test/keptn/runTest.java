@@ -111,7 +111,7 @@ public class runTest {
                 // Extract the response body as a string
                 String responseBody = EntityUtils.toString(responseEntity);
                 String responseBodyBeautified = jsonBeautify(responseBody);
-                System.out.println("checkTaskCompletion|Test execution in Progress: "+responseBody);
+                System.out.println("checkTaskCompletion|Test execution in Progress....");
 
                 // Extract the desired field from the response
                 // Modify this code according to your JSON structure
