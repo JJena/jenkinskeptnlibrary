@@ -10,7 +10,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import static com.test.keptn.utils.extractJsonField.extractFieldFromResponse;
 import static com.test.keptn.utils.jsonBeautify.jsonBeautify;
@@ -20,29 +19,42 @@ public class runEvaluate {
     private static Object Score = "";
     private static Object Results = "";
     private static final String keptnContextPath = "keptnContext";
+    private static final String evaluatePath = "/api/v1/event";
+    private static String getResultPath = "/api/mongodb-datastore/event?keptnContext=placeholder&type=sh.keptn.event.evaluation.finished";
     private static final String scorePath = "events..data..evaluation.score";
     private static final String resultPath = "events..data..evaluation.result";
+    private static String Url = "";
+    private static final String evaluateTestPayload = "{\n" +
+            "  \"data\": {\n" +
+            "    \"labels\": {\n" +
+            "       \"slofilename\": \"slo.yaml\" \n" +
+            "    },\n" +
+            "    \"evaluation\": {\n" +
+            "      \"timeframe\": \"5m\"\n" +
+            "    },\n" +
+            "    \"project\": \"loadtest\",\n" +
+            "    \"service\": \"test-service\",\n" +
+            "    \"stage\": \"loadtest-branch\"\n" +
+            "  },\n" +
+            "  \"source\": \"https://github.com/keptn/keptn/api\",\n" +
+            "  \"type\": \"sh.keptn.event.loadtest-branch.evaluation.triggered\"\n" +
+            "}";
 
-    public static void runEvaluate(String keptnEndpoint, String xToken) throws UnsupportedEncodingException, InterruptedException {
+    public static void runEvaluate(String keptnEndpoint, String xToken) throws InterruptedException {
 
+        //Trigger Evaluation
         try {
             // URL to send the POST request to
-            String url = keptnEndpoint + "/api/controlPlane/v1/project/loadtest/stage/loadtest-branch/service/test-service/evaluation";
-
-            // JSON payload for the POST request
-            String jsonPayload = "{\n" +
-                    "  \"start\": \"2023-06-14T19:47:21.086208886Z\",\n" +
-                    "  \"timeframe\": \"5m\"\n" +
-                    "}";
+            Url = keptnEndpoint + evaluatePath;
 
             // Create HttpClient
             HttpClient httpClient = HttpClientBuilder.create().build();
 
             // Create HttpPost request with URL
-            HttpPost httpPost = new HttpPost(url);
+            HttpPost httpPost = new HttpPost(Url);
 
             // Set the JSON payload as the request entity
-            StringEntity entity = new StringEntity(jsonPayload);
+            StringEntity entity = new StringEntity(evaluateTestPayload);
             httpPost.setEntity(entity);
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setHeader("Accept", "application/json");
@@ -53,6 +65,7 @@ public class runEvaluate {
 
             // Get the response entity
             HttpEntity responseEntity = response.getEntity();
+            assert response.getStatusLine().getStatusCode() < 400;
 
             if (responseEntity != null) {
                 // Extract the response body as a string
@@ -63,7 +76,7 @@ public class runEvaluate {
                 // Modify this code according to your JSON structure
                 // Here, we assume the response is in JSON and has a field named "result"
                 keptnContext = extractFieldFromResponse(responseBody, keptnContextPath);
-                System.out.println("Trigger Evaluation|keptnContext: " + keptnContext);
+                System.out.println("runEvaluate|keptnContext: " + keptnContext);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,15 +84,17 @@ public class runEvaluate {
 
         Thread.sleep(3000);
 
+        //Get results of the evaluation
         try {
-            // URL to send the POST request to
-            String url = keptnEndpoint + "/api/mongodb-datastore/event?keptnContext=" + keptnContext.toString() + "&type=sh.keptn.event.evaluation.finished";
+            getResultPath = getResultPath.replace("placeholder",keptnContext.toString());
+            // URL to send the GET request to
+            Url = keptnEndpoint + getResultPath;
 
             // Create HttpClient
             HttpClient httpClient = HttpClientBuilder.create().build();
 
             // Create HttpPost request with URL
-            HttpGet httpGet = new HttpGet(url);
+            HttpGet httpGet = new HttpGet(Url);
 
             httpGet.setHeader("Content-Type", "application/json");
             httpGet.setHeader("Accept", "application/json");
@@ -87,6 +102,7 @@ public class runEvaluate {
 
             // Send the GET request
             HttpResponse response = httpClient.execute(httpGet);
+            assert response.getStatusLine().getStatusCode() < 400;
 
             // Get the response entity
             HttpEntity responseEntity = response.getEntity();
@@ -95,15 +111,14 @@ public class runEvaluate {
                 // Extract the response body as a string
                 String responseBody = EntityUtils.toString(responseEntity);
                 String responseBodyBeautified = jsonBeautify(responseBody);
-                System.out.println("Response: " + responseBodyBeautified);
 
                 // Extract the desired field from the response
                 // Modify this code according to your JSON structure
                 // Here, we assume the response is in JSON and has a field named "result"
-                Object score = extractFieldFromResponse(responseBody, scorePath);
-                System.out.println("Get Score|score: " + score);
-                Object result = extractFieldFromResponse(responseBody, resultPath);
-                System.out.println("Get result|result: " + result);
+                Score = extractFieldFromResponse(responseBody, scorePath);
+                Results = extractFieldFromResponse(responseBody, resultPath);
+                System.out.println("runEvaluate|score: " + Score +"result: "+Results);
+                System.out.println("runEvaluate| Detailed result:\n" + responseBodyBeautified);
             }
         } catch (IOException e) {
             e.printStackTrace();
